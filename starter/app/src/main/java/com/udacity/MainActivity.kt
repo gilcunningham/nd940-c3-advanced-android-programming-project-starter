@@ -9,9 +9,13 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.lifecycleScope
 import com.udacity.databinding.ActivityMainBinding
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,10 +35,43 @@ class MainActivity : AppCompatActivity() {
 
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
-        // TODO: Implement code below
-//        binding.custom_button.setOnClickListener {
-//            download()
-//        }
+        binding.contentMain.showerButton.setOnClickListener {
+            //val star = binding.contentMain.star
+            doTest(binding.contentMain.customButton) //, star)
+        }
+        binding.contentMain.showerButton2.setOnClickListener {
+            //val star = binding.contentMain.star
+            doTest2(binding.contentMain.customButton) //, star)
+        }
+        binding.contentMain.showerButton3.setOnClickListener {
+            //val star = binding.contentMain.star
+            doTest3(binding.contentMain.customButton) //, star)
+        }
+
+    }
+
+    fun doTest(animatedProgressIndicator : AnimatedProgressIndicator) { //}, star: ImageView)  {
+        lifecycleScope.launch {
+            animatedProgressIndicator.startProgress()
+        }
+    }
+
+    fun doTest2(animatedProgressIndicator : AnimatedProgressIndicator) { //}, star: ImageView)  {
+        lifecycleScope.launch {
+
+            val percents = arrayOf(0, 15, 30, 34, 65, 70, 75, 89, 91, 100)
+            for (percent in percents) {
+                animatedProgressIndicator.updateProgress()
+                delay(500)
+            }
+
+        }
+    }
+
+    fun doTest3(animatedProgressIndicator : AnimatedProgressIndicator) { //}, star: ImageView)  {
+        lifecycleScope.launch {
+            animatedProgressIndicator.finishProgress()
+        }
     }
 
     private val receiver = object : BroadcastReceiver() {
