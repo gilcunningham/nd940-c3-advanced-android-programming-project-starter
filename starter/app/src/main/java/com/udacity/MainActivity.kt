@@ -9,94 +9,100 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
+import android.util.Log
+import android.widget.RadioGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Lifecycle
 import com.udacity.databinding.ActivityMainBinding
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    //private lateinit var binding: ActivityMainBinding
 
-    private var downloadID: Long = 0
+
+    private var downloadId: Long = 0
+    private lateinit var downloadOptions: RadioGroup
+    private val downloadReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            //val id = DownloadManager.STATUS_FAILED
+            val id: Long = intent?.getLongExtra(
+                DownloadManager.EXTRA_DOWNLOAD_ID, -1
+            ) ?: -1
+
+            println("*** onReceive() - $id | $downloadId")
+
+            if (downloadId == id) {
+                val downloadOk = DownloadHelper.with(this@MainActivity).isSuccessful(downloadId)
+                println("*** downloadOk: $downloadOk")
+
+                loadingButton.finishDownload()
+            }
+        }
+    }
+
+    private lateinit var loadingButton: LoadingButton
+
 
     private lateinit var notificationManager: NotificationManager
     private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
 
+    private var optionIndex = -1
+
+    private val downloadManager by lazy { getSystemService(DOWNLOAD_SERVICE) as DownloadManager }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
-
-        registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-
-        binding.contentMain.showerButton.setOnClickListener {
-            //val star = binding.contentMain.star
-            doTest(binding.contentMain.customButton) //, star)
-        }
-        binding.contentMain.showerButton2.setOnClickListener {
-            //val star = binding.contentMain.star
-            doTest2(binding.contentMain.customButton) //, star)
-        }
-        binding.contentMain.showerButton3.setOnClickListener {
-            //val star = binding.contentMain.star
-            doTest3(binding.contentMain.customButton) //, star)
-        }
-
+        setupViews(binding)
+        registerReceiver(downloadReceiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
     }
 
-    fun doTest(animatedProgressIndicator : AnimatedProgressIndicator) { //}, star: ImageView)  {
-        lifecycleScope.launch {
-            animatedProgressIndicator.startProgress()
-        }
-    }
-
-    fun doTest2(animatedProgressIndicator : AnimatedProgressIndicator) { //}, star: ImageView)  {
-        lifecycleScope.launch {
-
-            val percents = arrayOf(0, 15, 30, 34, 65, 70, 75, 89, 91, 100)
-            for (percent in percents) {
-                animatedProgressIndicator.updateProgress()
-                delay(500)
+    private fun setupViews(binding: ActivityMainBinding) {
+        downloadOptions = binding.contentMain.downloadOptions.apply {
+            setOnCheckedChangeListener { _, index ->
+                optionIndex = when (index) {
+                    R.id.download_option1 -> 0
+                    R.id.download_option2 -> 1
+                    R.id.download_option3 -> 2
+                    else -> -1
+                }
             }
-
+        }
+        loadingButton = binding.contentMain.downloadButton.apply {
+            //setOnClickListener { downloadSelectedFile() }
         }
     }
 
-    fun doTest3(animatedProgressIndicator : AnimatedProgressIndicator) { //}, star: ImageView)  {
-        lifecycleScope.launch {
-            animatedProgressIndicator.finishProgress()
+    private fun checkInvalidDownload() =
+        if (optionIndex == INVALID_DOWNLOAD_ID) {
+            Toast.makeText(
+                this, R.string.message_no_download_selected, Toast.LENGTH_SHORT
+            ).show()
+            true
+        } else {
+            false
         }
-    }
 
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+    private fun downloadSelectedFile() {
+        if (checkInvalidDownload()) {
+            return
         }
-    }
-
-    private fun download() {
-        val request =
-            DownloadManager.Request(Uri.parse(URL))
-                .setTitle(getString(R.string.app_name))
-                .setDescription(getString(R.string.app_description))
-                .setRequiresCharging(false)
-                .setAllowedOverMetered(true)
-                .setAllowedOverRoaming(true)
-
-        val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-        downloadID =
-            downloadManager.enqueue(request)// enqueue puts the download request in the queue.
+        downloadId = DownloadHelper.with(this).download(URLS[optionIndex])
     }
 
     companion object {
-        private const val URL =
-            "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip"
         private const val CHANNEL_ID = "channelId"
+        private val URLS = listOf(
+            "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip",
+            "https://github.com/bumptech/glide/archive/master.zip",
+            "https://github.com/square/retrofit/archive/master.zi"
+        )
+        private const val INVALID_DOWNLOAD_ID = -1
     }
 }
