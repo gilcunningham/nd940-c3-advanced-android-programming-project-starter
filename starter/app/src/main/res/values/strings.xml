@@ -4,8 +4,7 @@
     <string name="action_settings">Settings</string>
 
     <string name="default_loading_button_text">Click Me</string>
-    <string name="default_loading_button_animation_text">Text 1</string>
-    <string name="default_loading_button_animation_text2">Text 2</string>
+    <string name="default_loading_button_text_done">Done</string>
 
     <string name="notification_title">Udacity: Android Kotlin Nanodegree </string>
     <string name="notification_description">The Project 3 repository is downloaded</string>

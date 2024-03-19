@@ -3,14 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="viewModel"
-            type="com.udacity.MainViewModel" />
-
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
@@ -104,14 +96,14 @@
                 android:textSize="18sp" />
 
         </RadioGroup>
-        
+
         <com.udacity.LoadingButton
             android:id="@+id/download_button"
             android:layout_width="match_parent"
+            android:background="#000000"
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
             android:layout_marginHorizontal="40dp"
-            android:background="@android:color/holo_green_light"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -119,7 +111,8 @@
             app:text="@string/button_label"
             app:textSize="18sp"
             app:textAnimation="Loading..."
-            app:textAnimation2="Finished" />
+            app:textAnimation2="Saving..."
+            app:textFinished="Done" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

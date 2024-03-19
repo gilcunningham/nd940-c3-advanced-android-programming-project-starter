@@ -7,16 +7,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.Lifecycle
 import com.udacity.databinding.ActivityMainBinding
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,7 +34,7 @@ class MainActivity : AppCompatActivity() {
                 val downloadOk = DownloadHelper.with(this@MainActivity).isSuccessful(downloadId)
                 println("*** downloadOk: $downloadOk")
 
-                loadingButton.finishDownload()
+                loadingButton.onFinished()
             }
         }
     }
@@ -84,6 +80,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(
                 this, R.string.message_no_download_selected, Toast.LENGTH_SHORT
             ).show()
+            loadingButton.onFinished()
             true
         } else {
             false
