@@ -1,4 +1,4 @@
-package com.udacity
+package com.udacity.helper
 
 import android.app.DownloadManager
 import android.content.Context
@@ -11,20 +11,14 @@ class DownloadHelper private constructor(private val context: Context) {
         context.getSystemService(AppCompatActivity.DOWNLOAD_SERVICE) as DownloadManager
     }
 
-    fun isSuccessful(id: Long) : Boolean {
+    fun isSuccessful(id: Long): Boolean {
         val dmQuery = DownloadManager.Query().apply { setFilterById(id) }
         dmQuery.setFilterById(id)
         return runCatching {
             downloadManager.query(dmQuery).use { cursor ->
                 if (cursor != null && cursor.count > 0) {
                     val columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
-                    return if (cursor.moveToFirst() && cursor.getInt(columnIndex) == DownloadManager.STATUS_SUCCESSFUL) {
-                        println("SUCCESS")
-                        true
-                    } else {
-                        println("FAIL")
-                        false
-                    }
+                    return cursor.moveToFirst() && cursor.getInt(columnIndex) == DownloadManager.STATUS_SUCCESSFUL
                 }
             }
         }.isSuccess
@@ -33,8 +27,8 @@ class DownloadHelper private constructor(private val context: Context) {
     fun download(url: String): Long {
         val request =
             DownloadManager.Request(Uri.parse(url))
-                .setTitle(context.getString(R.string.notification_title))
-                .setDescription(context.getString(R.string.notification_description))
+                //.setTitle(context.getString(R.string.notification_title))
+                //.setDescription(context.getString(R.string.notification_description))
                 .setRequiresCharging(false)
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)
@@ -42,7 +36,7 @@ class DownloadHelper private constructor(private val context: Context) {
     }
 
     companion object {
-        fun with(context: Context) : DownloadHelper {
+        fun with(context: Context): DownloadHelper {
             return DownloadHelper(context)
         }
     }

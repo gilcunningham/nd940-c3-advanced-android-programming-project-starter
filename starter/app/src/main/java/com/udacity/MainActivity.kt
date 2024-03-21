@@ -12,7 +12,10 @@ import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.udacity.databinding.ActivityMainBinding
+import com.udacity.helper.DownloadHelper
+import com.udacity.helper.NotificationHelper
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,32 +26,30 @@ class MainActivity : AppCompatActivity() {
     private lateinit var downloadOptions: RadioGroup
     private val downloadReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            //val id = DownloadManager.STATUS_FAILED
-            val id: Long = intent?.getLongExtra(
-                DownloadManager.EXTRA_DOWNLOAD_ID, -1
-            ) ?: -1
-
+            val id: Long = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1) ?: -1
             println("*** onReceive() - $id | $downloadId")
-
             if (downloadId == id) {
                 val downloadOk = DownloadHelper.with(this@MainActivity).isSuccessful(downloadId)
                 println("*** downloadOk: $downloadOk")
-
+                showNotification()
                 loadingButton.onFinished()
             }
         }
     }
 
     private lateinit var loadingButton: LoadingButton
-
-
-    private lateinit var notificationManager: NotificationManager
+    private val notificationManager: NotificationManager by lazy {
+        ContextCompat.getSystemService(
+            this,
+            NotificationManager::class.java
+        ) as NotificationManager
+    }
     private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
 
     private var optionIndex = -1
 
-    private val downloadManager by lazy { getSystemService(DOWNLOAD_SERVICE) as DownloadManager }
+    //private val downloadManager by lazy { getSystemService(DOWNLOAD_SERVICE) as DownloadManager }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,20 +72,34 @@ class MainActivity : AppCompatActivity() {
             }
         }
         loadingButton = binding.contentMain.downloadButton.apply {
-            //setOnClickListener { downloadSelectedFile() }
+            setOnClickListener { downloadSelectedFile() }
         }
     }
 
-    private fun checkInvalidDownload() =
-        if (optionIndex == INVALID_DOWNLOAD_ID) {
-            Toast.makeText(
-                this, R.string.message_no_download_selected, Toast.LENGTH_SHORT
-            ).show()
-            loadingButton.onFinished()
-            true
-        } else {
-            false
-        }
+    private fun showNotification() {
+        //val builder = NotificationCompat.Builder(
+        //    applicationContext,
+        //    CHANNEL_ID
+        //)
+        //    .setSmallIcon(R.drawable.ic_assistant_black_24dp)
+        //    .setContentTitle("MY title")
+        //    .setContentText("My context text")
+
+        NotificationHelper.with(this).sendNotification(DetailActivity::class.java)
+    }
+
+
+    private fun checkInvalidDownload() = if (optionIndex == INVALID_DOWNLOAD_ID) {
+        Toast.makeText(
+            this,
+            R.string.message_no_download_selected,
+            Toast.LENGTH_SHORT
+        ).show()
+        loadingButton.onFinished()
+        true
+    } else {
+        false
+    }
 
     private fun downloadSelectedFile() {
         if (checkInvalidDownload()) {
