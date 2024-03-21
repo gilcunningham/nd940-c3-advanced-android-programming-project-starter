@@ -11,49 +11,14 @@
         tools:context=".MainActivity"
         tools:showIn="@layout/activity_main">
 
-
-        <!--
-        <Button
-            android:id="@+id/showerButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="Start"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/showerButton2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="Updating"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/showerButton" />
-
-        <Button
-            android:id="@+id/showerButton3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="Finish"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/showerButton2" />
-        -->
-
         <ImageView
             android:id="@+id/download_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_assistant_black_24dp" />
+
+            app:srcCompat="@drawable/ic_assistant_black" />
 
         <RadioGroup
             android:id="@+id/download_options"
@@ -65,7 +30,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/download_image">
 
-            <!--adding a radio button -->
             <RadioButton
                 android:id="@+id/download_option1"
                 android:layout_width="wrap_content"
@@ -75,7 +39,6 @@
                 android:text="@string/download_option1"
                 android:textSize="18sp" />
 
-            <!--adding a radio button -->
             <RadioButton
                 android:id="@+id/download_option2"
                 android:layout_width="wrap_content"
@@ -85,7 +48,6 @@
                 android:text="@string/download_option2"
                 android:textSize="18sp" />
 
-            <!--adding a radio button -->
             <RadioButton
                 android:id="@+id/download_option3"
                 android:layout_width="wrap_content"
@@ -110,8 +72,6 @@
             app:layout_constraintVertical_bias="0.0"
             app:text="@string/button_label"
             app:textSize="18sp"
-            app:textAnimation="Loading..."
-            app:textAnimation2="Saving..."
             app:textFinished="Done" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

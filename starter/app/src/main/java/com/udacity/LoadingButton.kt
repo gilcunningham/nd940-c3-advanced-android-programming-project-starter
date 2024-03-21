@@ -36,7 +36,7 @@ class LoadingButton @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr),
     View.OnClickListener {
 
-    private var bgColor = ResourcesCompat.getColor(
+    private var background = ResourcesCompat.getColor(
         resources, R.color.design_default_color_background, null
     )
     private lateinit var circleProgress: CircularProgress
@@ -46,24 +46,21 @@ class LoadingButton @JvmOverloads constructor(
         fillUnitDrawable?.let { LayoutParams(it.minimumWidth, it.minimumHeight) }
     private val fillUnitSize = fillUnitDrawable?.minimumHeight ?: 0
     private lateinit var lifecycleScope: LifecycleCoroutineScope
+    private var onClickListener: OnClickListener = this
     private val parentAsViewGroup by lazy { parent as ViewGroup }
-    private var paddingHorizontal = DEFAULT_INSET
-    private var paddingVertical = DEFAULT_INSET
     private val paintBorder = Paint().apply {
         color = Color.BLACK
         isAntiAlias = true
         strokeWidth = 2f
         style = Paint.Style.STROKE
     }
-    private val showerAnimatorList = mutableListOf<AnimatorSet>()
     private val textPaint = Paint().apply {
         color = DEFAULT_TEXT_COLOR
         isAntiAlias = true
         textSize = DEFAULT_TEXT_SIZE_PX
     }
-    private val internalHeight =
-        (FILL_HEIGHT + textPaint.textSize + (2 * paddingVertical)).toInt()
-    private var onClickListener: OnClickListener = this
+    private val showerAnimatorList = mutableListOf<AnimatorSet>()
+    private val internalHeight = FILL_HEIGHT + textPaint.textSize + (2 * DEFAULT_INSET)
     private lateinit var offCanvas: Canvas
     private lateinit var offBitmap: Bitmap
     private lateinit var progress: Progress
@@ -73,7 +70,6 @@ class LoadingButton @JvmOverloads constructor(
     private var textFinished = context.getText(R.string.default_loading_button_text_done).toString()
 
     init {
-
         context.withStyledAttributes(attrs, R.styleable.LoadingButton) {
             getString(R.styleable.LoadingButton_text)?.let { text = it }
             getString(R.styleable.LoadingButton_textFinished)?.let { textFinished = it }
@@ -81,16 +77,12 @@ class LoadingButton @JvmOverloads constructor(
                 textSize = getDimension(R.styleable.LoadingButton_textSize, DEFAULT_TEXT_SIZE_PX)
                 color = getColor(R.styleable.LoadingButton_textColor, DEFAULT_TEXT_COLOR)
             }
-            bgColor = Color.BLACK //getColor(R.styleable.LoadingButton_backgroundColor, bgColor)
-
-
+            background = Color.BLACK //getColor(R.styleable.LoadingButton_backgroundColor, bgColor)
         }
         setOnClickListener(this)
     }
 
     private fun absoluteCenter(start: Float, finish: Float) = ((start - finish) / 2f).absoluteValue
-
-    private fun absoluteLength(start: Float, finish: Float): Float = (start - finish).absoluteValue
 
     private fun addUnitOfProgress(): AppCompatImageView {
         val progressUnit = AppCompatImageView(context)
@@ -131,10 +123,7 @@ class LoadingButton @JvmOverloads constructor(
         progressUnit.translationY = y + progress.top + randomY
         progressUnit.translationX = x + progress.right - (fillUnitSize / 2)
         val mover = ObjectAnimator.ofFloat(
-            progressUnit,
-            TRANSLATION_X,
-            progressUnit.translationX,
-            x + progress.left
+            progressUnit, TRANSLATION_X, progressUnit.translationX, x + progress.left
         )
         mover.interpolator = AccelerateInterpolator(1f)
         val animator = AnimatorSet().apply {
@@ -151,7 +140,7 @@ class LoadingButton @JvmOverloads constructor(
     }
 
     private fun drawBackground(canvas: Canvas) {
-        canvas.drawColor(bgColor)
+        canvas.drawColor(background)
         canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paintBorder)
     }
 
@@ -161,7 +150,7 @@ class LoadingButton @JvmOverloads constructor(
         textPaint.getTextBounds(text, 0, text.length, labelBounds)
         val textX = (width - labelBounds.width()) / 2f
         val textHeight = textPaint.textSize
-        val textY = absoluteCenter(height.toFloat(), textHeight) + textHeight
+        val textY = absoluteCenter(height.toFloat(), textHeight) + textHeight - 2F
         canvas.drawText(text, textX, textY, textPaint)
     }
 
@@ -178,14 +167,9 @@ class LoadingButton @JvmOverloads constructor(
         progressState = ProgressState.ANIMATING
         animateShower()
         progress.play(this@LoadingButton)
-
-        println("*** DONE PLAYING FILL - $progressState")
-
         if (progressState == ProgressState.ANIMATING) {
-
             progressState = ProgressState.ANIMATING2
             circleProgress.play(this@LoadingButton) {
-                println("*** DONE PLAYING CIRCE - $progressState")
                 if (progressState == ProgressState.ANIMATING2) {
                     onFinished()
                 }
@@ -195,7 +179,7 @@ class LoadingButton @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        layoutParams.height = internalHeight
+        layoutParams.height = internalHeight.toInt()
         parentAsViewGroup.findViewTreeLifecycleOwner()?.let {
             lifecycleScope = it.lifecycleScope
         }
@@ -205,9 +189,7 @@ class LoadingButton @JvmOverloads constructor(
         if (progressState != ProgressState.IDLE) {
             return
         }
-        lifecycleScope.launch {
-            onAnimate()
-        }
+        lifecycleScope.launch { onAnimate() }
         if (onClickListener != this) {
             onClickListener.onClick(view)
         }
@@ -216,7 +198,6 @@ class LoadingButton @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawBitmap(offBitmap, 0f, 0f, null)
-
         if (progressState == ProgressState.ANIMATING ||
             progressState == ProgressState.ANIMATING2
         ) {
@@ -236,7 +217,6 @@ class LoadingButton @JvmOverloads constructor(
     }
 
     fun onFinished() {
-        println("*** ON FINISHED")
         progressState = ProgressState.FINISHING
         circleProgress.stop()
         animateFinishing()
@@ -259,45 +239,30 @@ class LoadingButton @JvmOverloads constructor(
         size: Float = constraintRect.height() - HALF_INSET,
         private val duration: Duration = Duration.DEFAULT,
         private val durationMillis: Long = duration.millis,
-        _color: Int = Color.WHITE,
-
-        //progress.left + absoluteCenter(progress.left, progress.right) - (size / 2)
-
-        _left: Float = constraintRect.centerX() - (size / 2),
-        _top: Float = constraintRect.top + QUARTER_INSET,
-        _right: Float = _left + size,
-        _bottom: Float = _top + size
-    ) : RectF(_left, _top, _right, _bottom) {
-
-        private var animating = false
-
-        lateinit var animatorSet: AnimatorSet
-        private val paint = Paint().apply {
+        private val color: Int = Color.WHITE,
+        left: Float = constraintRect.centerX() - (size / 2),
+        top: Float = constraintRect.top + QUARTER_INSET,
+        private val paint: Paint = Paint().apply {
             isAntiAlias = true
             style = Paint.Style.FILL
-            color = _color
+            this.color = color
         }
+    ) : RectF(left, top, left + size, top + size) {
+
+        private var animating = false
+        private var animatorSet = AnimatorSet()
         private var sweep = 0
 
         fun onDraw(canvas: Canvas) {
-            println("*** circle onDraw() - $animating")
             if (animating) {
-                canvas.drawArc(
-                    this,
-                    START_ANGLE,
-                    sweep.toFloat(),
-                    true,
-                    paint
-                )
+                canvas.drawArc(this, START_ANGLE, sweep.toFloat(),true, paint)
             }
         }
 
         suspend fun play(parentView: View, blocking: suspend () -> Unit) {
-            println("*** circle play")
             sweep = 0
             animating = true
             val list = animatorList(parentView)
-
             animatorSet = AnimatorSet().apply {
                 playSequentially(list)
                 doOnEnd {
@@ -328,7 +293,6 @@ class LoadingButton @JvmOverloads constructor(
         }
 
         fun stop() {
-            println("*** STOP")
             animating = false
             animatorSet.cancel()
         }
@@ -343,13 +307,9 @@ class LoadingButton @JvmOverloads constructor(
     private class Progress(
         parentWidth: Int,
         parentHeight: Int,
-        //paddingHorizontal: Int = DEFAULT_INSET,
-        //paddingVertical: Int = DEFAULT_INSET,
         internalWidth: Float = (parentWidth / 2) + (2f * DEFAULT_INSET),
         left: Float = (parentWidth - internalWidth) / 2f,
         top: Float = (parentHeight - FILL_HEIGHT) / 2f,
-        _right: Float = left + internalWidth,
-        _bottom: Float = top + FILL_HEIGHT,
         private var progressFill: Float = 0f,
         private val fillColor: Int = DEFAULT_FILL_COLOR,
         private val paintFill: Paint = Paint().apply { color = fillColor },
@@ -359,7 +319,7 @@ class LoadingButton @JvmOverloads constructor(
             strokeWidth = 2f
         },
         private val randomizer: Random = Random().apply { setSeed(System.currentTimeMillis()) }
-    ) : RectF(left, top, _right, _bottom) {
+    ) : RectF(left, top, left + internalWidth, top + FILL_HEIGHT) {
 
         private val randomProgress = mutableListOf<Float>()
 
@@ -370,14 +330,14 @@ class LoadingButton @JvmOverloads constructor(
 
         private fun generateRandomProgress() {
             val fillSize = width()
-            val incrSize: Float = (fillSize / 100f) * 4
+            val increment: Float = (fillSize / 100f) * 4
             val fillSizeOneThird = fillSize / 3
             val fillSizeTwoThirds = fillSize * 2 / 3
             var sum = 0f
             randomProgress.clear()
 
             while (sum < fillSize) {
-                val nextSize: Float = randomizer.nextFloat() * 100 % incrSize
+                val nextSize: Float = randomizer.nextFloat() * 100 % increment
                 val next = when {
                     sum <= fillSizeOneThird -> nextSize / 4f
                     sum <= fillSizeTwoThirds -> nextSize / 2f
@@ -395,32 +355,28 @@ class LoadingButton @JvmOverloads constructor(
 
         suspend fun play(parentView: View) {
             generateRandomProgress()
-            //animateShower()
             progressFill = 0f
             randomProgress.forEach {
                 progressFill += it
-                println("*** invalidate() 6")
                 parentView.invalidate()
                 delay(10)
             }
-            //endShower()
         }
     }
 
     enum class ProgressState { IDLE, ANIMATING, ANIMATING2, FINISHING }
 
-    companion object {
+    private companion object {
         const val QUARTER_INSET = 4
         const val HALF_INSET = 8
         const val DEFAULT_INSET = 16
         const val FILL_HEIGHT = 48
         const val DEFAULT_TEXT_SIZE_PX = 54f
-        const val DEFAULT_TEXT_ANIM_SIZE_PX = 42f
         const val DEFAULT_TEXT_COLOR = Color.WHITE
         const val DEFAULT_FILL_COLOR = Color.WHITE
         const val BURST_COUNT = 20
         const val START_ANGLE = 360f
-        const val CIRCLE_ANIMATIONS = 3
+        const val CIRCLE_ANIMATIONS = 100
         const val CIRCLE_ANIMATION_DELAY = 500L
     }
 }

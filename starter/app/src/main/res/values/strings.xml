@@ -6,14 +6,18 @@
     <string name="default_loading_button_text">Click Me</string>
     <string name="default_loading_button_text_done">Done</string>
 
+    <string name="notification_content">The Project 3 repository is downloaded</string>
+    <string name="notification_text">Check the status</string>
     <string name="notification_title">Udacity: Android Kotlin Nanodegree </string>
-    <string name="notification_description">The Project 3 repository is downloaded</string>
+    <!--
     <string name="notification_button">See changes</string>
+    -->
+    <string name="download_notification_channel_id" translatable="false">download_channel</string>
+    <string name="download_notification_channel_name">ND940C3-Project Channel Name</string>
+    <string name="download_notification_channel_description">ND940C3-Project Channel Description</string>
 
     <string name="button_label">Download</string>
-    <string name="button_loading_label">Downloading …</string>
-    <string name="button_loading2_label">Downloaded</string>
-    <string name="button_loading">We are loading </string>
+    <string name="button_label_finished">Done</string>
     <string name="title_activity_detail">DetailActivity</string>
 
     <string name="message_no_download_selected">Please select the file to download</string>
