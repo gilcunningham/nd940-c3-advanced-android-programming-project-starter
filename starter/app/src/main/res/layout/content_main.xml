@@ -14,19 +14,19 @@
         <ImageView
             android:id="@+id/download_image"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="120dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-
-            app:srcCompat="@drawable/ic_assistant_black" />
+            app:srcCompat="@drawable/ic_assistant_black_24dp"
+            tools:ignore="ContentDescription" />
 
         <RadioGroup
             android:id="@+id/download_options"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginHorizontal="@dimen/half_margin"
+            android:layout_marginTop="@dimen/default_margin"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/download_image">
 
@@ -35,44 +35,45 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:padding="4dp"
+                android:padding="@dimen/radio_button_padding"
                 android:text="@string/download_option1"
-                android:textSize="18sp" />
+                android:textAppearance="@style/AppTextStyle" />
 
             <RadioButton
                 android:id="@+id/download_option2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:padding="4dp"
+                android:padding="@dimen/radio_button_padding"
                 android:text="@string/download_option2"
-                android:textSize="18sp" />
+                android:textAppearance="@style/AppTextStyle" />
 
             <RadioButton
                 android:id="@+id/download_option3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:padding="4dp"
+                android:padding="@dimen/radio_button_padding"
                 android:text="@string/download_option3"
-                android:textSize="18sp" />
+                android:textAppearance="@style/AppTextStyle" />
 
         </RadioGroup>
 
+        <!-- either android:background or app:background will work -->
         <com.udacity.LoadingButton
             android:id="@+id/download_button"
             android:layout_width="match_parent"
-            android:background="#000000"
+            android:background="@color/download_app_black"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
-            android:layout_marginHorizontal="40dp"
+            android:layout_marginBottom="@dimen/default_margin"
+            android:layout_marginHorizontal="@dimen/default_margin"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintVertical_bias="0.0"
             app:text="@string/button_label"
-            app:textSize="18sp"
-            app:textFinished="Done" />
+            app:textSize="@dimen/text_size"
+            app:backgroundColor="@color/download_app_black"
+            app:textFinished="@string/button_label_finished" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

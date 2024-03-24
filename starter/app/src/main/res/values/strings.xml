@@ -2,27 +2,24 @@
     <string name="app_name">ND940C3-Project</string>
     <string name="app_description">Download files from Internet</string>
     <string name="action_settings">Settings</string>
-
+    <string name="button_label">Download</string>
+    <string name="button_label_finished">Done</string>
     <string name="default_loading_button_text">Click Me</string>
     <string name="default_loading_button_text_done">Done</string>
-
-    <string name="notification_content">The Project 3 repository is downloaded</string>
-    <string name="notification_text">Check the status</string>
-    <string name="notification_title">Udacity: Android Kotlin Nanodegree </string>
-    <!--
-    <string name="notification_button">See changes</string>
-    -->
+    <string name="detail_button_ok">OK</string>
+    <string name="detail_download_status_label">Status:</string>
+    <string name="detail_download_status_success">Success</string>
+    <string name="detail_download_status_failure">Fail</string>
+    <string name="detail_file_name_label">File name:</string>
     <string name="download_notification_channel_id" translatable="false">download_channel</string>
     <string name="download_notification_channel_name">ND940C3-Project Channel Name</string>
     <string name="download_notification_channel_description">ND940C3-Project Channel Description</string>
-
-    <string name="button_label">Download</string>
-    <string name="button_label_finished">Done</string>
-    <string name="title_activity_detail">DetailActivity</string>
-
-    <string name="message_no_download_selected">Please select the file to download</string>
-
     <string name="download_option1">Glide - Image Loading Library by BumpTech</string>
     <string name="download_option2">LoadApp - Current repository by Udacity</string>
     <string name="download_option3">Retrofit - Type-safe HTTP client for Android and Java by Square, Inc</string>
+    <string name="notification_content">The Project 3 repository is downloaded</string>
+    <string name="notification_text">Check the status</string>
+    <string name="notification_title">Udacity: Android Kotlin Nanodegree </string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="toast_message_select_download">Please select the file to download</string>
 </resources>
