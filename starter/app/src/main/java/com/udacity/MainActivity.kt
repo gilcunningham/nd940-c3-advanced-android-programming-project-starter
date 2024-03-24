@@ -1,8 +1,6 @@
 package com.udacity
 
 import android.app.DownloadManager
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -11,45 +9,45 @@ import android.os.Bundle
 import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import com.udacity.databinding.ActivityMainBinding
 import com.udacity.helper.DownloadHelper
 import com.udacity.helper.NotificationHelper
 
 class MainActivity : AppCompatActivity() {
 
-    //private lateinit var binding: ActivityMainBinding
-
-
     private var downloadId: Long = 0
     private lateinit var downloadOptions: RadioGroup
     private val downloadReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val id: Long = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1) ?: -1
-            println("*** onReceive() - $id | $downloadId")
             if (downloadId == id) {
-                val downloadOk = DownloadHelper.with(this@MainActivity).isSuccessful(downloadId)
-                println("*** downloadOk: $downloadOk")
+                loadingButton.stop()
                 showNotification()
-                loadingButton.onFinished()
             }
         }
     }
-
     private lateinit var loadingButton: LoadingButton
-    private val notificationManager: NotificationManager by lazy {
-        ContextCompat.getSystemService(
-            this,
-            NotificationManager::class.java
-        ) as NotificationManager
-    }
-    private lateinit var pendingIntent: PendingIntent
-    private lateinit var action: NotificationCompat.Action
-
     private var optionIndex = -1
 
-    //private val downloadManager by lazy { getSystemService(DOWNLOAD_SERVICE) as DownloadManager }
+    private fun checkInvalidDownload() = if (optionIndex == INVALID_DOWNLOAD_ID) {
+        Toast.makeText(
+            this,
+            R.string.toast_message_select_download,
+            Toast.LENGTH_SHORT
+        ).show()
+        loadingButton.stop()
+        true
+    } else {
+        false
+    }
+
+    private fun downloadSelectedFile() {
+        if (checkInvalidDownload()) {
+            return
+        }
+        downloadId = DownloadHelper.with(this)
+            .download(URLS[optionIndex], getString(TITLES[optionIndex]))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,43 +75,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showNotification() {
-        //val builder = NotificationCompat.Builder(
-        //    applicationContext,
-        //    CHANNEL_ID
-        //)
-        //    .setSmallIcon(R.drawable.ic_assistant_black_24dp)
-        //    .setContentTitle("MY title")
-        //    .setContentText("My context text")
-
-        NotificationHelper.with(this).sendNotification(DetailActivity::class.java)
-    }
-
-
-    private fun checkInvalidDownload() = if (optionIndex == INVALID_DOWNLOAD_ID) {
-        Toast.makeText(
-            this,
-            R.string.message_no_download_selected,
-            Toast.LENGTH_SHORT
-        ).show()
-        loadingButton.onFinished()
-        true
-    } else {
-        false
-    }
-
-    private fun downloadSelectedFile() {
-        if (checkInvalidDownload()) {
-            return
-        }
-        downloadId = DownloadHelper.with(this).download(URLS[optionIndex])
+        val contentIntent = DetailActivity.makeIntent(this, downloadId)
+        NotificationHelper.with(this).sendNotification(contentIntent)
     }
 
     companion object {
-        private const val CHANNEL_ID = "channelId"
         private val URLS = listOf(
-            "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip",
             "https://github.com/bumptech/glide/archive/master.zip",
-            "https://github.com/square/retrofit/archive/master.zi"
+            "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip",
+            "https://github.com/square/retrofit/archive/master.zi" // broken
+        )
+        private val TITLES = listOf(
+            R.string.download_option1,
+            R.string.download_option2,
+            R.string.download_option3,
         )
         private const val INVALID_DOWNLOAD_ID = -1
     }

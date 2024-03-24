@@ -17,4 +17,12 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="AppTextStyle" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">@dimen/text_size</item>
+    </style>
+
+    <style name="AppTextStyle.Failed" parent="AppTextStyle">
+        <item name="android:textColor">@color/download_app_fail</item>
+    </style>
+
 </resources>

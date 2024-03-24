@@ -11,9 +11,17 @@ class DownloadHelper private constructor(private val context: Context) {
         context.getSystemService(AppCompatActivity.DOWNLOAD_SERVICE) as DownloadManager
     }
 
+    fun download(url: String, title: String): Long {
+        val request = DownloadManager.Request(Uri.parse(url))
+            .setTitle(title)
+            .setRequiresCharging(false)
+            .setAllowedOverMetered(true)
+            .setAllowedOverRoaming(true)
+        return downloadManager.enqueue(request)
+    }
+
     fun isSuccessful(id: Long): Boolean {
         val dmQuery = DownloadManager.Query().apply { setFilterById(id) }
-        dmQuery.setFilterById(id)
         return runCatching {
             downloadManager.query(dmQuery).use { cursor ->
                 if (cursor != null && cursor.count > 0) {
@@ -24,15 +32,17 @@ class DownloadHelper private constructor(private val context: Context) {
         }.isSuccess
     }
 
-    fun download(url: String): Long {
-        val request =
-            DownloadManager.Request(Uri.parse(url))
-                //.setTitle(context.getString(R.string.notification_title))
-                //.setDescription(context.getString(R.string.notification_description))
-                .setRequiresCharging(false)
-                .setAllowedOverMetered(true)
-                .setAllowedOverRoaming(true)
-        return downloadManager.enqueue(request)
+    fun fileName(id: Long) : String {
+        val dmQuery = DownloadManager.Query().apply { setFilterById(id) }
+        return runCatching {
+            downloadManager.query(dmQuery).use { cursor ->
+                if (cursor != null && cursor.count > 0) {
+                    val columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_TITLE)
+                    cursor.moveToFirst()
+                    return cursor.getString(columnIndex)
+                }
+            }
+        }.toString()
     }
 
     companion object {

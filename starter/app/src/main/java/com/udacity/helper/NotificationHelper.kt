@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.udacity.R
@@ -36,8 +35,7 @@ class NotificationHelper private constructor(private val context: Context) {
         }
     }
 
-    fun <C : AppCompatActivity> sendNotification(targetActivity: Class<C>) {
-        val contentIntent = Intent(context, targetActivity)
+    fun sendNotification(contentIntent : Intent) {
         val contentPendingIntent = PendingIntent.getActivity(
             context,
             REQUEST_CODE,
@@ -45,7 +43,7 @@ class NotificationHelper private constructor(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT
         )
         val builder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_assistant_black)
+            .setSmallIcon(R.drawable.ic_assistant_black_24dp)
             .setContentTitle(context.getString(R.string.notification_title))
             .setContentText(context.getString(R.string.notification_content))
             .setContentIntent(contentPendingIntent)
