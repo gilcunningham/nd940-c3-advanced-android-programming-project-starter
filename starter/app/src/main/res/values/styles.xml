@@ -21,6 +21,11 @@
         <item name="android:textSize">@dimen/text_size</item>
     </style>
 
+    <style name="AppTextStyle.Button" parent="AppTextStyle">
+        <item name="android:textColor">@color/white</item>
+
+    </style>
+
     <style name="AppTextStyle.Failed" parent="AppTextStyle">
         <item name="android:textColor">@color/download_app_fail</item>
     </style>
