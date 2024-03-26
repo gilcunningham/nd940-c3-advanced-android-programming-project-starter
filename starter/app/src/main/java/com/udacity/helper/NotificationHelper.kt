@@ -14,12 +14,20 @@ import com.udacity.R
 class NotificationHelper private constructor(private val context: Context) {
 
     private val channelId = context.getString(R.string.download_notification_channel_id)
+    private val pendingIntentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+    } else {
+        PendingIntent.FLAG_UPDATE_CURRENT
+    }
     private val notificationManager: NotificationManager by lazy {
         ContextCompat.getSystemService(
             context,
             NotificationManager::class.java
         ) as NotificationManager
     }
+
+    fun areNotificationsEnabled() = notificationManager.areNotificationsEnabled()
+
     private fun createChannel(channelId: String, channelName: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationChannel = NotificationChannel(
@@ -40,20 +48,19 @@ class NotificationHelper private constructor(private val context: Context) {
             context,
             REQUEST_CODE,
             contentIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            pendingIntentFlags
         )
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_assistant_black_24dp)
             .setContentTitle(context.getString(R.string.notification_title))
             .setContentText(context.getString(R.string.notification_content))
-            .setContentIntent(contentPendingIntent)
-            .setStyle(
-                NotificationCompat.InboxStyle()
-                    .addLine("\n")
-                    .addLine(context.getString(R.string.notification_text))
-                )
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
+            .addAction(
+                R.drawable.ic_assistant_black_24dp,
+                context.getString(R.string.notification_text),
+                contentPendingIntent
+            )
         notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
 
@@ -62,12 +69,12 @@ class NotificationHelper private constructor(private val context: Context) {
         private const val REQUEST_CODE = 100
 
         fun with(context: Context): NotificationHelper {
-            val helper = NotificationHelper(context.applicationContext)
-            helper.createChannel(
-                context.getString(R.string.download_notification_channel_id),
-                context.getString(R.string.download_notification_channel_name)
-            )
-            return helper
+            return NotificationHelper(context.applicationContext).apply {
+                createChannel(
+                    context.getString(R.string.download_notification_channel_id),
+                    context.getString(R.string.download_notification_channel_name)
+                )
+            }
         }
     }
 }

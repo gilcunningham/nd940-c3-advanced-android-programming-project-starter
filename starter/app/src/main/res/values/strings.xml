@@ -20,6 +20,9 @@
     <string name="notification_content">The Project 3 repository is downloaded</string>
     <string name="notification_text">Check the status</string>
     <string name="notification_title">Udacity: Android Kotlin Nanodegree </string>
+    <string name="notifications_permission_goto_settings">Enable Now</string>
+    <string name="notifications_permission_granted">Notifications permission granted</string>
+    <string name="notifications_permission_required">App Notifications: Disabled</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="toast_message_select_download">Please select the file to download</string>
 </resources>
